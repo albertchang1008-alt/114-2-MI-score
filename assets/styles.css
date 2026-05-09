@@ -55,6 +55,12 @@ a {
   font-weight: 700;
 }
 
+.brand span:last-child,
+.teacher-brand strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .brand-button {
   border: 0;
   background: transparent;
@@ -824,6 +830,8 @@ dd,
 .teacher-filter-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: end;
 }
 
 .teacher-filter-buttons button {
@@ -1144,6 +1152,19 @@ td {
     grid-template-columns: 1fr;
   }
 
+  .shell {
+    width: min(100% - 24px, 1180px);
+    margin-top: 18px;
+  }
+
+  .student-workspace {
+    min-height: calc(100vh - 120px);
+  }
+
+  .student-workspace.has-result {
+    grid-template-columns: 1fr;
+  }
+
   .teacher-app-header {
     position: static;
     display: grid;
@@ -1151,7 +1172,8 @@ td {
   }
 
   .teacher-header-actions {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     width: 100%;
   }
 
@@ -1183,6 +1205,20 @@ td {
     display: grid;
   }
 
+  .teacher-filter-buttons {
+    justify-content: start;
+  }
+
+  .teacher-select-label {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .teacher-select-label select {
+    width: 100%;
+    max-width: none;
+  }
+
   .inline-selected-score {
     justify-items: start;
   }
@@ -1202,6 +1238,67 @@ td {
 
   .row-head {
     display: grid;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    padding: 12px 14px;
+  }
+
+  .teacher-app-header {
+    padding: 16px 14px;
+  }
+
+  .teacher-brand {
+    gap: 12px;
+    font-size: 20px;
+  }
+
+  .teacher-brand .brand-mark {
+    width: 38px;
+    height: 38px;
+  }
+
+  .teacher-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .teacher-metric-card strong {
+    font-size: 30px;
+  }
+
+  .teacher-card {
+    padding: 18px;
+  }
+
+  .teacher-histogram {
+    grid-template-columns: repeat(7, minmax(32px, 1fr));
+    gap: 6px;
+    min-height: 190px;
+  }
+
+  .teacher-bin {
+    grid-template-rows: 24px 112px 24px;
+    font-size: 12px;
+  }
+
+  .teacher-legend {
+    font-size: 13px;
+  }
+
+  .alert-input-row {
+    grid-template-columns: 1fr auto auto;
+    font-size: 16px;
+  }
+
+  .alert-input-row input {
+    width: 88px;
+  }
+
+  .teacher-filter-buttons button {
+    min-width: 0;
+    flex: 1 1 120px;
   }
 }
 
