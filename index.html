@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>成績查詢入口</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="config.js"></script>
+    <script defer src="assets/shared.js"></script>
+    <script defer src="assets/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <button id="secret-admin-trigger" class="brand brand-button" type="button" aria-label="成績查詢入口">
+        <span class="brand-mark">成</span>
+        <span id="course-title">成績查詢</span>
+      </button>
+    </header>
+
+    <main class="shell">
+      <section class="workspace">
+        <div class="panel query-panel">
+          <div class="panel-head">
+            <p class="eyebrow">學生入口</p>
+            <h1>查詢個人成績</h1>
+          </div>
+
+          <form id="lookup-form" class="form">
+            <label>
+              <span>學號</span>
+              <input id="student-id" name="studentId" inputmode="numeric" autocomplete="off" required>
+            </label>
+            <label>
+              <span>姓名</span>
+              <input id="student-name" name="name" autocomplete="name" required>
+            </label>
+            <button type="submit">查詢</button>
+          </form>
+
+          <p id="system-note" class="note"></p>
+          <div id="lookup-status" class="status" role="status" aria-live="polite"></div>
+        </div>
+
+        <section id="result-panel" class="panel result-panel hidden" aria-live="polite">
+          <div class="panel-head">
+            <p class="eyebrow">查詢結果</p>
+            <h2 id="student-name-output">-</h2>
+          </div>
+          <dl class="result-grid">
+            <div>
+              <dt>學號</dt>
+              <dd id="student-id-output">-</dd>
+            </div>
+            <div>
+              <dt>班級</dt>
+              <dd id="student-class-output">-</dd>
+            </div>
+            <div>
+              <dt>線上小考平均</dt>
+              <dd id="quiz-score">-</dd>
+            </div>
+            <div>
+              <dt>Zuvio test 平均</dt>
+              <dd id="zuvio-score">-</dd>
+            </div>
+            <div>
+              <dt>期中考</dt>
+              <dd id="midterm-score">-</dd>
+            </div>
+            <div>
+              <dt>期末考</dt>
+              <dd id="final-score">-</dd>
+            </div>
+            <div class="total">
+              <dt>總成績</dt>
+              <dd id="total-score">-</dd>
+            </div>
+          </dl>
+          <div id="missing-output" class="missing hidden"></div>
+
+          <h3>各項排名</h3>
+          <div class="table-wrap compact-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>授課班級排名</th>
+                </tr>
+              </thead>
+              <tbody id="rank-rows"></tbody>
+            </table>
+          </div>
+
+          <h3>線上小考明細</h3>
+          <div class="table-wrap compact-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>小考</th>
+                  <th>最高成績</th>
+                  <th>時間總和</th>
+                  <th>練習次數</th>
+                </tr>
+              </thead>
+              <tbody id="quiz-detail-rows"></tbody>
+            </table>
+          </div>
+
+          <h3>Zuvio test 明細</h3>
+          <div class="table-wrap compact-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>測驗</th>
+                  <th>成績</th>
+                </tr>
+              </thead>
+              <tbody id="zuvio-detail-rows"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="teacher-dashboard" class="hidden mt-6">
+        <div class="panel">
+          <div class="panel-head row-head">
+            <div>
+              <p class="eyebrow">教師統計看板</p>
+              <h2>班級成績統計</h2>
+            </div>
+            <button id="teacher-logout" class="secondary-action" type="button">登出</button>
+          </div>
+
+          <div id="teacher-class-tabs" class="flex flex-wrap gap-2 mb-4"></div>
+          <div id="teacher-status" class="status" role="status" aria-live="polite"></div>
+
+          <div id="teacher-overview-cards" class="grid grid-cols-1 gap-3 md:grid-cols-4 mb-4"></div>
+
+          <div id="teacher-summary-cards" class="grid grid-cols-1 gap-3 md:grid-cols-3"></div>
+          <div class="mt-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p class="eyebrow">學生列表</p>
+              <h3 class="mt-1 mb-0 text-xl">個人成績與缺漏狀態</h3>
+            </div>
+            <div id="teacher-list-note" class="text-sm text-slate-500"></div>
+          </div>
+          <div id="teacher-student-list" class="mt-4 grid grid-cols-1 gap-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="admin-login-dialog" class="login-dialog">
+      <form id="hidden-admin-form" class="dialog-card">
+        <div class="panel-head">
+          <p class="eyebrow">教師登入</p>
+          <h2>管理者入口</h2>
+        </div>
+        <label>
+          <span>帳號</span>
+          <input id="hidden-admin-user" autocomplete="username" required>
+        </label>
+        <label>
+          <span>密碼</span>
+          <input id="hidden-admin-password" type="password" autocomplete="current-password" required>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" id="close-admin-login" class="secondary-action">取消</button>
+          <button type="submit">登入</button>
+        </div>
+        <div id="hidden-admin-status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </dialog>
+
+    <dialog id="score-detail-modal" class="login-dialog">
+      <div class="dialog-card">
+        <div class="panel-head">
+          <p class="eyebrow">學生明細</p>
+          <h2 id="score-modal-title">-</h2>
+        </div>
+        <div id="score-modal-body" class="grid gap-2"></div>
+        <div class="dialog-actions">
+          <button type="button" id="close-score-modal" class="secondary-action">關閉</button>
+        </div>
+      </div>
+    </dialog>
+  </body>
+</html>

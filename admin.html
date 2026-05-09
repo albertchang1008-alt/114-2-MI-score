@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>成績後台</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <script defer src="config.js"></script>
+    <script defer src="assets/shared.js"></script>
+    <script defer src="assets/admin.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="成績查詢入口">
+        <span class="brand-mark">成</span>
+        <span id="course-title">成績後台</span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">入口</a>
+      </nav>
+    </header>
+
+    <main class="shell">
+      <section class="workspace admin-layout">
+        <div id="admin-gate" class="panel">
+          <div class="panel-head">
+            <p class="eyebrow">教師端</p>
+            <h1>登入後台</h1>
+          </div>
+          <form id="admin-form" class="form">
+            <label>
+              <span>帳號</span>
+              <input id="admin-user" autocomplete="username" required>
+            </label>
+            <label>
+              <span>密碼</span>
+              <input id="admin-password" type="password" autocomplete="current-password" required>
+            </label>
+            <button type="submit">載入後台</button>
+          </form>
+          <div id="admin-status" class="status" role="status" aria-live="polite"></div>
+        </div>
+
+        <section id="dashboard" class="panel dashboard hidden" aria-live="polite">
+          <div class="panel-head row-head">
+            <div>
+              <p class="eyebrow">後台</p>
+              <h2>統計摘要</h2>
+            </div>
+            <button id="logout-button" class="secondary-action" type="button">登出</button>
+          </div>
+
+          <div class="metric-grid">
+            <div><span>人數</span><strong id="metric-count">-</strong></div>
+            <div><span>平均（90 分）</span><strong id="metric-average">-</strong></div>
+            <div><span>最高</span><strong id="metric-max">-</strong></div>
+            <div><span>最低</span><strong id="metric-min">-</strong></div>
+          </div>
+
+          <h3>權重設定</h3>
+          <div id="weights" class="weights"></div>
+
+          <h3>全班成績圖像</h3>
+          <div id="distribution-chart" class="distribution-chart"></div>
+
+          <h3>班級 > 學生 > 明細</h3>
+          <div id="class-groups" class="class-groups"></div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
