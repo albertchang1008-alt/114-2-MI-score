@@ -87,7 +87,7 @@ function lookupStudent(params) {
 function getSummary() {
   const settings = readSettings();
   const weights = readWeights();
-  const data = buildGradeDataset(settings, weights, { includeDetails: false });
+  const data = buildGradeDataset(settings, weights, { includeDetails: true });
   const totals = numericScores(data.students.map((student) => student.total));
   const sum = totals.reduce((acc, score) => acc + score, 0);
 

@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>成績查詢入口</title>
     <link rel="stylesheet" href="assets/styles.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="config.js"></script>
     <script defer src="assets/shared.js"></script>
     <script defer src="assets/app.js"></script>
@@ -20,7 +18,7 @@
     </header>
 
     <main class="shell">
-      <section class="workspace">
+      <section id="student-workspace" class="workspace student-workspace">
         <div class="panel query-panel">
           <div class="panel-head">
             <p class="eyebrow">學生入口</p>
@@ -52,6 +50,10 @@
             <div>
               <dt>學號</dt>
               <dd id="student-id-output">-</dd>
+            </div>
+            <div>
+              <dt>授課班級</dt>
+              <dd id="student-course-class-output">-</dd>
             </div>
             <div>
               <dt>班級</dt>
@@ -95,13 +97,13 @@
 
           <h3>線上小考明細</h3>
           <div class="table-wrap compact-table">
-            <table>
+            <table class="quiz-detail-table">
               <thead>
                 <tr>
                   <th>小考</th>
                   <th>最高成績</th>
                   <th>時間總和</th>
-                  <th>練習次數</th>
+                  <th>作答次數</th>
                 </tr>
               </thead>
               <tbody id="quiz-detail-rows"></tbody>
@@ -123,67 +125,6 @@
         </section>
       </section>
 
-      <section id="teacher-dashboard" class="hidden mt-6">
-        <div class="panel">
-          <div class="panel-head row-head">
-            <div>
-              <p class="eyebrow">教師統計看板</p>
-              <h2>班級成績統計</h2>
-            </div>
-            <button id="teacher-logout" class="secondary-action" type="button">登出</button>
-          </div>
-
-          <div id="teacher-class-tabs" class="flex flex-wrap gap-2 mb-4"></div>
-          <div id="teacher-status" class="status" role="status" aria-live="polite"></div>
-
-          <div id="teacher-overview-cards" class="grid grid-cols-1 gap-3 md:grid-cols-4 mb-4"></div>
-
-          <div id="teacher-summary-cards" class="grid grid-cols-1 gap-3 md:grid-cols-3"></div>
-          <div class="mt-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p class="eyebrow">學生列表</p>
-              <h3 class="mt-1 mb-0 text-xl">個人成績與缺漏狀態</h3>
-            </div>
-            <div id="teacher-list-note" class="text-sm text-slate-500"></div>
-          </div>
-          <div id="teacher-student-list" class="mt-4 grid grid-cols-1 gap-3"></div>
-        </div>
-      </section>
     </main>
-
-    <dialog id="admin-login-dialog" class="login-dialog">
-      <form id="hidden-admin-form" class="dialog-card">
-        <div class="panel-head">
-          <p class="eyebrow">教師登入</p>
-          <h2>管理者入口</h2>
-        </div>
-        <label>
-          <span>帳號</span>
-          <input id="hidden-admin-user" autocomplete="username" required>
-        </label>
-        <label>
-          <span>密碼</span>
-          <input id="hidden-admin-password" type="password" autocomplete="current-password" required>
-        </label>
-        <div class="dialog-actions">
-          <button type="button" id="close-admin-login" class="secondary-action">取消</button>
-          <button type="submit">登入</button>
-        </div>
-        <div id="hidden-admin-status" class="status" role="status" aria-live="polite"></div>
-      </form>
-    </dialog>
-
-    <dialog id="score-detail-modal" class="login-dialog">
-      <div class="dialog-card">
-        <div class="panel-head">
-          <p class="eyebrow">學生明細</p>
-          <h2 id="score-modal-title">-</h2>
-        </div>
-        <div id="score-modal-body" class="grid gap-2"></div>
-        <div class="dialog-actions">
-          <button type="button" id="close-score-modal" class="secondary-action">關閉</button>
-        </div>
-      </div>
-    </dialog>
   </body>
 </html>

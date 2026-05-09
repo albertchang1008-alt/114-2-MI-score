@@ -9,64 +9,113 @@
     <script defer src="assets/shared.js"></script>
     <script defer src="assets/admin.js"></script>
   </head>
-  <body>
-    <header class="topbar">
-      <a class="brand" href="index.html" aria-label="成績查詢入口">
-        <span class="brand-mark">成</span>
-        <span id="course-title">成績後台</span>
-      </a>
-      <nav class="nav">
-        <a href="index.html">入口</a>
-      </nav>
-    </header>
+  <body class="admin-page">
+    <section id="admin-gate" class="admin-login-screen">
+      <form id="admin-form" class="admin-login-card">
+        <div class="teacher-brand">
+          <span class="brand-mark">成</span>
+          <strong>成績後台</strong>
+        </div>
+        <label>
+          <span>帳號</span>
+          <input id="admin-user" autocomplete="username" required>
+        </label>
+        <label>
+          <span>密碼</span>
+          <input id="admin-password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">登入後台</button>
+        <div id="admin-status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
 
-    <main class="shell">
-      <section class="workspace admin-layout">
-        <div id="admin-gate" class="panel">
-          <div class="panel-head">
-            <p class="eyebrow">教師端</p>
-            <h1>登入後台</h1>
+    <section id="dashboard" class="teacher-dashboard hidden" aria-live="polite">
+      <div class="teacher-app">
+        <header class="teacher-app-header">
+          <div class="teacher-brand" aria-label="成績後台">
+            <span class="brand-mark">成</span>
+            <strong>成績後台</strong>
           </div>
-          <form id="admin-form" class="form">
-            <label>
-              <span>帳號</span>
-              <input id="admin-user" autocomplete="username" required>
-            </label>
-            <label>
-              <span>密碼</span>
-              <input id="admin-password" type="password" autocomplete="current-password" required>
-            </label>
-            <button type="submit">載入後台</button>
-          </form>
-          <div id="admin-status" class="status" role="status" aria-live="polite"></div>
+          <div class="teacher-header-actions">
+            <span id="teacher-alert-count" class="teacher-alert-pill">0 名示警</span>
+            <button id="logout-button" class="teacher-logout-button" type="button">登出</button>
+          </div>
+        </header>
+
+        <section id="teacher-selection-bar" class="teacher-selection-bar hidden">
+          <div class="teacher-step-control">
+            <span class="teacher-step-label">1. 選擇考試</span>
+            <div class="teacher-select-group">
+              <label class="teacher-select-label">
+                <span>類別</span>
+                <select id="teacher-exam-category-select"></select>
+              </label>
+              <label id="teacher-exam-detail-label" class="teacher-select-label hidden">
+                <span>第幾次</span>
+                <select id="teacher-exam-detail-select"></select>
+              </label>
+            </div>
+          </div>
+          <div id="teacher-class-step" class="teacher-step-control hidden">
+            <span class="teacher-step-label">2. 選擇範圍</span>
+            <div id="teacher-class-tabs" class="teacher-tabs"></div>
+          </div>
+        </section>
+
+        <div id="teacher-status" class="status" role="status" aria-live="polite"></div>
+        <div id="teacher-empty-state" class="teacher-empty-state hidden">請先選擇考試項目或學期總分。</div>
+
+        <div id="teacher-metric-cards" class="teacher-metric-grid hidden"></div>
+
+        <div class="teacher-analysis-grid hidden">
+          <section class="teacher-card teacher-chart-card">
+            <div class="teacher-card-head">
+              <h3 id="teacher-chart-title">分數分布</h3>
+            </div>
+            <div id="teacher-histogram" class="teacher-histogram"></div>
+            <div class="teacher-legend">
+              <span><i class="legend-normal"></i>正常</span>
+              <span><i class="legend-deviation"></i>均值偏差</span>
+              <span><i class="legend-fixed"></i>低於門檻</span>
+            </div>
+          </section>
+
+          <section class="teacher-card teacher-alert-settings">
+            <h3>示警設定</h3>
+            <div id="teacher-alert-settings"></div>
+          </section>
         </div>
 
-        <section id="dashboard" class="panel dashboard hidden" aria-live="polite">
-          <div class="panel-head row-head">
-            <div>
-              <p class="eyebrow">後台</p>
-              <h2>統計摘要</h2>
+        <div id="teacher-alert-banner" class="teacher-alert-banner hidden"></div>
+
+        <section class="teacher-card teacher-table-card hidden">
+          <div class="teacher-table-head">
+            <h3 id="teacher-table-title">明細</h3>
+            <div class="teacher-filter-buttons">
+              <button id="teacher-export-class" type="button">匯出全部成績</button>
+              <button id="teacher-show-all" type="button">全部</button>
+              <button id="teacher-show-alerts" type="button">示警</button>
             </div>
-            <button id="logout-button" class="secondary-action" type="button">登出</button>
           </div>
-
-          <div class="metric-grid">
-            <div><span>人數</span><strong id="metric-count">-</strong></div>
-            <div><span>平均（90 分）</span><strong id="metric-average">-</strong></div>
-            <div><span>最高</span><strong id="metric-max">-</strong></div>
-            <div><span>最低</span><strong id="metric-min">-</strong></div>
+          <div class="teacher-table-wrap">
+            <table class="teacher-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>姓名</th>
+                  <th><button class="sort-button" type="button" data-sort-key="score">本次</button></th>
+                  <th>班級排名</th>
+                  <th>全校排名</th>
+                  <th class="term-total-column">學期總分</th>
+                  <th>狀態</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="teacher-student-rows"></tbody>
+            </table>
           </div>
-
-          <h3>權重設定</h3>
-          <div id="weights" class="weights"></div>
-
-          <h3>全班成績圖像</h3>
-          <div id="distribution-chart" class="distribution-chart"></div>
-
-          <h3>班級 > 學生 > 明細</h3>
-          <div id="class-groups" class="class-groups"></div>
         </section>
-      </section>
-    </main>
+      </div>
+    </section>
   </body>
 </html>
