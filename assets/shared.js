@@ -7,9 +7,15 @@ function setText(id, value) {
   if (node) node.textContent = value ?? "-";
 }
 
+function applyCourseTitle(title) {
+  const safeTitle = title || "成績查詢";
+  setText("course-title", safeTitle);
+  document.title = safeTitle;
+}
+
 function applyChrome() {
   const config = getConfig();
-  setText("course-title", config.COURSE_TITLE || "成績查詢");
+  applyCourseTitle(config.COURSE_TITLE || "成績查詢");
   const sheetLink = document.getElementById("sheet-link");
   if (sheetLink && config.SHEET_URL) sheetLink.href = config.SHEET_URL;
 }

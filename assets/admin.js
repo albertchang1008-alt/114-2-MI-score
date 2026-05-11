@@ -7,6 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const dashboard = document.getElementById("dashboard");
   const teacherStatus = document.getElementById("teacher-status");
 
+  applyTeacherTitle();
+  loadTeacherSettings();
+
   const state = {
     payload: null,
     selectedClassName: "",
@@ -57,6 +60,28 @@ document.addEventListener("DOMContentLoaded", () => {
     window.sessionStorage.removeItem("gradePortalToken");
     window.location.href = "index.html";
   });
+
+  async function loadTeacherSettings() {
+    try {
+      const settings = await requestApi({ action: "settings" });
+      applyTeacherTitle(settings.courseTitle);
+    } catch (error) {
+      // 保留 config.js 的備援後台名稱。
+    }
+  }
+
+  function applyTeacherTitle(courseTitle) {
+    const config = getConfig();
+    const baseTitle = courseTitle || config.COURSE_TITLE || "成績";
+    const title = `${baseTitle}-教師後台`;
+    document.title = title;
+    document.querySelectorAll(".teacher-brand strong").forEach((node) => {
+      node.textContent = title;
+    });
+    document.querySelectorAll(".teacher-brand[aria-label]").forEach((node) => {
+      node.setAttribute("aria-label", title);
+    });
+  }
 
   function showDashboardShell() {
     gate.classList.add("hidden");

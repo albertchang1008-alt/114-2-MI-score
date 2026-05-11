@@ -12,15 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let logoClicks = 0;
   let logoTimer;
 
+  if (new URLSearchParams(window.location.search).get("mode") === "admin") {
+    window.location.replace("admin.html");
+    return;
+  }
+
   if (!config.SCRIPT_URL) {
     systemNote.textContent = "前台畫面已就緒；部署 Apps Script 後，請把 Web App URL 填入 config.js。";
   } else {
     systemNote.textContent = config.REQUIRE_STUDENT_NAME ? "請輸入學號與姓名查詢。" : "請輸入學號查詢。";
-  }
-
-  if (new URLSearchParams(window.location.search).get("mode") === "admin") {
-    window.location.replace("admin.html");
-    return;
+    loadPortalSettings();
   }
 
   form.addEventListener("submit", async (event) => {
@@ -58,6 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "admin.html";
     }
   });
+
+  async function loadPortalSettings() {
+    try {
+      const settings = await requestApi({ action: "settings" });
+      if (settings.courseTitle) applyCourseTitle(settings.courseTitle);
+    } catch (error) {
+      // 保留 config.js 的備援課程名稱。
+    }
+  }
 
   function renderResult(student) {
     setText("student-name-output", student.name || student.maskedName || "-");

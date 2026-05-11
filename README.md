@@ -108,6 +108,7 @@
 
 | Key | Value |
 | --- | --- |
+| 課程名稱 | 114-2 微生物與免疫學及實驗成績 |
 | ScoreItems | 線上小考,Zuvio test,期中考,期末考 |
 | PrimaryColor | #1f5f8b |
 | PassingScore | 60 |
@@ -258,6 +259,8 @@ window.GRADE_PORTAL_CONFIG = {
 };
 ```
 
+`COURSE_TITLE` 是備援名稱；學生入口實際顯示會優先讀取 Google Sheet 中 `課程名稱` 的設定值。教師後台會顯示為 `課程名稱-教師後台`。
+
 ### 3. 部署 GitHub Pages
 
 1. 將整個資料夾推到 GitHub repository。
@@ -310,4 +313,3 @@ node --check assets/admin.js
 node --check assets/shared.js
 node -e "new Function(require('fs').readFileSync('gas/Code.gs','utf8')); console.log('Code.gs ok')"
 ```
-
