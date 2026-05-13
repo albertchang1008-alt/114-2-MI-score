@@ -29,6 +29,7 @@
   - 作答次數
 - Zuvio test 明細會列出每次測驗成績。
 - 學生頁初始畫面置中，查詢後改為查詢區與結果區的響應式版面。
+- 首頁會顯示 `線上小考班級完成度排行`，只呈現班級彙總，不回傳學生姓名、學號或個別作答紀錄。
 
 ### 教師後台
 
@@ -58,6 +59,11 @@
   - 狀態
 - 點學生列會在該列下方展開學生完整明細；點另一位學生時，上一位會自動收起。
 - 班級頁提供 `匯出全部成績`，可下載該班完整 CSV。
+- 後台包含 `線上小考完成度` 模組：
+  - 班級完成度排行
+  - 班級學生完成度明細
+  - 完成度達標分數、計算測驗與計算班級設定
+  - `super_admin` 可修改完成度設定，`teacher` 僅能讀取
 
 ## 檔案結構
 
@@ -153,6 +159,41 @@
 
 學生頁與後台都會顯示每次小考成績；學生頁另外顯示時間總和與作答次數。
 
+### `students`
+
+完成度模組使用的學生名冊長表，已由 `修課名單` 建立公式同步。
+
+必要欄位：
+
+| className | studentId | name |
+| --- | --- | --- |
+| N511 | 114510501 | 王又玄 |
+
+### `quizAttempts`
+
+完成度模組使用的線上小考作答長表，已由 `線上小考成績` 建立公式同步。
+
+必要欄位：
+
+| className | studentId | name | quizId | score | time | attempts |
+| --- | --- | --- | --- | --- | --- | --- |
+| N511 | 114510501 | 王O玄 | Ch1-2 | 82 | 1 小時 31 分鐘 53 秒 | 4 |
+
+GAS 仍會直接讀取 `線上小考成績` 作為主要來源，`quizAttempts` 保留為後續檢視與整合使用。
+
+### `completionSettings`
+
+完成度計算設定。
+
+| Key | Value | 說明 |
+| --- | --- | --- |
+| passingScore | 60 | 線上小考達標分數 |
+| enabledQuizIds | Ch1-2,Ch3-4 | 參與完成度計算的測驗，以逗號分隔 |
+| enabledClassNames | N511,N512 | 參與完成度計算的班級，以逗號分隔 |
+
+若 `enabledQuizIds` 為空，前台排行會顯示 `目前尚未設定計算項目`，不會報錯。
+若 `enabledClassNames` 為空，前台排行會顯示 `目前尚未設定計算班級`，不會報錯。
+
 ### `Zuvio test`
 
 用來讀取 Zuvio test 每次成績。
@@ -170,11 +211,42 @@
 
 建議欄位：
 
-| Username | Password | DisplayName |
-| --- | --- | --- |
-| teacher_account | teacher_password | 教師名稱 |
+| 帳號 | 密碼 | 使用者 | 更新時間 | 角色 |
+| --- | --- | --- | --- | --- |
+| teacher_account | teacher_password | 教師名稱 |  | super_admin |
 
 這個分頁應只允許 Google Sheet 所有者或授權管理者編輯。
+
+角色說明：
+
+- `super_admin`：最高權限管理者，可修改完成度設定。
+- `teacher`：一般教師，只能讀取統計資料與明細，不可修改設定。
+
+後端儲存完成度設定時會再次檢查角色，不只依賴前端畫面 disabled。
+
+## 線上小考完成度規則
+
+### 單一測驗完成
+
+```text
+學生在該測驗的最高分 >= completionSettings.passingScore
+```
+
+### 班級完成率
+
+```text
+班級完成率 = 全班實際完成項目數 / (班級人數 × 勾選測驗數) × 100%
+```
+
+完成度排行只計算 `completionSettings.enabledClassNames` 中勾選的班級。
+
+### 班級排行排序
+
+依下列優先順序排序：
+
+1. 完成率：高到低
+2. 班級平均：高到低
+3. 未完成項目數：少到多
 
 ## 排名規則
 
@@ -253,13 +325,13 @@
 ```js
 window.GRADE_PORTAL_CONFIG = {
   SCRIPT_URL: "你的 Apps Script Web App URL",
-  COURSE_TITLE: "課程名稱",
+  COURSE_TITLE: "載入中…",
   SHEET_URL: "Google Sheet 連結",
   REQUIRE_STUDENT_NAME: true
 };
 ```
 
-`COURSE_TITLE` 是備援名稱；學生入口實際顯示會優先讀取 Google Sheet 中 `課程名稱` 的設定值。教師後台會顯示為 `課程名稱-教師後台`。
+`COURSE_TITLE` 是載入期間的備援文字；學生入口實際顯示會優先讀取 Google Sheet 中 `課程名稱` 的設定值。教師後台會顯示為 `課程名稱-教師後台`。
 
 ### 3. 部署 GitHub Pages
 

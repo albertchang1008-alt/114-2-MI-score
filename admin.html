@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>教師後台</title>
+    <title>載入中…-教師後台</title>
     <link rel="stylesheet" href="assets/styles.css">
     <script defer src="config.js"></script>
     <script defer src="assets/shared.js"></script>
@@ -14,7 +14,7 @@
       <form id="admin-form" class="admin-login-card">
         <div class="teacher-brand">
           <span class="brand-mark">成</span>
-          <strong>教師後台</strong>
+          <strong>載入中…-教師後台</strong>
         </div>
         <label>
           <span>帳號</span>
@@ -32,9 +32,9 @@
     <section id="dashboard" class="teacher-dashboard hidden" aria-live="polite">
       <div class="teacher-app">
         <header class="teacher-app-header">
-          <div class="teacher-brand" aria-label="教師後台">
+          <div class="teacher-brand" aria-label="載入中…-教師後台">
             <span class="brand-mark">成</span>
-            <strong>教師後台</strong>
+            <strong>載入中…-教師後台</strong>
           </div>
           <div class="teacher-header-actions">
             <span id="teacher-alert-count" class="teacher-alert-pill">0 名示警</span>
@@ -63,6 +63,63 @@
         </section>
 
         <div id="teacher-status" class="status" role="status" aria-live="polite"></div>
+        <section id="teacher-completion-module" class="teacher-card teacher-completion-module hidden">
+          <div class="teacher-card-head">
+            <h3>線上小考完成度</h3>
+            <span id="completion-role-note" class="teacher-muted-note"></span>
+          </div>
+          <div class="completion-admin-grid">
+            <section class="completion-settings-panel">
+              <h4>完成度設定</h4>
+              <div id="completion-settings-box"></div>
+            </section>
+            <section class="completion-ranking-panel">
+              <h4>班級完成度排行</h4>
+              <div id="completion-ranking-status" class="status"></div>
+              <div class="teacher-table-wrap">
+                <table class="teacher-table completion-admin-table">
+                  <thead>
+                    <tr>
+                      <th>排名</th>
+                      <th>班級</th>
+                      <th>完成率</th>
+                      <th>進度</th>
+                      <th>平均分</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="completion-class-rows"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+          <section id="completion-student-section" class="completion-student-section hidden">
+            <div class="teacher-table-head">
+              <h4 id="completion-student-title">學生完成度明細</h4>
+              <div class="teacher-filter-buttons">
+                <button id="completion-filter-all" type="button">全部</button>
+                <button id="completion-filter-done" type="button">已全部完成</button>
+                <button id="completion-filter-not-done" type="button">未全數完成</button>
+              </div>
+            </div>
+            <div class="teacher-table-wrap">
+              <table class="teacher-table completion-student-table">
+                <thead>
+                  <tr>
+                    <th>班級</th>
+                    <th>學號</th>
+                    <th>姓名</th>
+                    <th>完成率</th>
+                    <th>已完成測驗</th>
+                    <th>未完成測驗</th>
+                    <th>狀態</th>
+                  </tr>
+                </thead>
+                <tbody id="completion-student-rows"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
         <div id="teacher-empty-state" class="teacher-empty-state hidden">請先選擇考試項目或學期總分。</div>
 
         <div id="teacher-metric-cards" class="teacher-metric-grid hidden"></div>

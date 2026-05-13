@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     systemNote.textContent = config.REQUIRE_STUDENT_NAME ? "請輸入學號與姓名查詢。" : "請輸入學號查詢。";
     loadPortalSettings();
+    loadCompletionRankings();
   }
 
   form.addEventListener("submit", async (event) => {
@@ -69,6 +70,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function loadCompletionRankings() {
+    const statusNode = document.getElementById("completion-rank-status");
+    const wrap = document.getElementById("completion-rank-wrap");
+    const rows = document.getElementById("completion-rank-rows");
+    if (!statusNode || !wrap || !rows) return;
+
+    try {
+      const response = await requestApi({ action: "completionRankings" });
+      const rankings = response.rankings || [];
+      if (!rankings.length) {
+        statusNode.className = "status";
+        statusNode.textContent = response.message || "目前尚無完成度資料。";
+        wrap.classList.add("hidden");
+        rows.innerHTML = "";
+        return;
+      }
+
+      rows.innerHTML = rankings.map((item, index) => `
+        <tr>
+          <td><span class="rank-medal">${escapeHtml(rankLabel(index + 1))}</span></td>
+          <td><strong>${escapeHtml(item.className)}</strong></td>
+          <td>
+            <strong>${formatPercent(item.completionRate)}</strong>
+            <div class="completion-progress"><span style="width:${completionWidth(item.completionRate)}%"></span></div>
+          </td>
+          <td>${escapeHtml(item.completedCount)} / ${escapeHtml(item.expectedCount)}</td>
+          <td>${formatScore(item.averageScore)}</td>
+        </tr>
+      `).join("");
+      statusNode.textContent = "";
+      wrap.classList.remove("hidden");
+    } catch (error) {
+      statusNode.className = "status error";
+      statusNode.textContent = "完成度排行暫時無法讀取。";
+      wrap.classList.add("hidden");
+    }
+  }
+
   function renderResult(student) {
     setText("student-name-output", student.name || student.maskedName || "-");
     setText("student-id-output", student.studentId);
@@ -95,6 +134,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+
+function rankLabel(rank) {
+  if (rank === 1) return "🥇 第 1 名";
+  if (rank === 2) return "🥈 第 2 名";
+  if (rank === 3) return "🥉 第 3 名";
+  return `第 ${rank} 名`;
+}
+
+function completionWidth(value) {
+  const number = Number(value);
+  if (Number.isNaN(number)) return 0;
+  return Math.min(100, Math.max(0, number));
+}
+
+function formatPercent(value) {
+  const number = Number(value);
+  if (Number.isNaN(number)) return "-";
+  return `${number.toFixed(1)}%`;
+}
 
 function renderRanks(student) {
   const rows = document.getElementById("rank-rows");

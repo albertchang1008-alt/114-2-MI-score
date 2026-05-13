@@ -40,7 +40,8 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 14px clamp(18px, 4vw, 48px);
+  min-height: 112px;
+  padding: 22px clamp(22px, 4vw, 56px);
   background: rgba(255, 255, 255, 0.94);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(12px);
@@ -49,13 +50,15 @@ a {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   min-width: 0;
+  max-width: min(100%, 980px);
   text-decoration: none;
   font-weight: 700;
 }
 
-.brand span:last-child,
+.brand-copy,
+.brand-title,
 .teacher-brand strong {
   min-width: 0;
   overflow-wrap: anywhere;
@@ -78,11 +81,33 @@ a {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
   color: white;
   background: var(--blue);
-  border-radius: 7px;
+  border-radius: 10px;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.brand-copy {
+  display: grid;
+  gap: 4px;
+  text-align: left;
+}
+
+.brand-kicker {
+  color: var(--teal);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.brand-title {
+  color: var(--ink);
+  font-size: clamp(28px, 3vw, 42px);
+  font-weight: 800;
+  line-height: 1.15;
 }
 
 .nav {
@@ -140,6 +165,10 @@ a {
 
 .panel-head {
   margin-bottom: 20px;
+}
+
+.compact-head {
+  margin-bottom: 10px;
 }
 
 .panel-head h1,
@@ -581,6 +610,7 @@ dd,
 .teacher-metric-grid,
 .teacher-analysis-grid,
 .teacher-alert-banner,
+.teacher-completion-module,
 .teacher-table-card {
   width: min(100% - 48px, 1400px);
   margin-left: auto;
@@ -641,6 +671,97 @@ dd,
   align-items: start;
   justify-content: space-between;
   gap: 24px;
+}
+
+.teacher-muted-note {
+  color: #647085;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.teacher-completion-module {
+  margin-top: 28px;
+}
+
+.completion-admin-grid {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 22px;
+}
+
+.completion-settings-panel,
+.completion-ranking-panel,
+.completion-student-section {
+  min-width: 0;
+}
+
+.completion-settings-panel h4,
+.completion-ranking-panel h4,
+.completion-student-section h4 {
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.completion-score-field {
+  margin-bottom: 16px;
+}
+
+.completion-setting-group {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.completion-setting-title {
+  color: #151515;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.completion-quiz-list {
+  display: grid;
+  gap: 8px;
+  max-height: 280px;
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid #d8d7d2;
+  border-radius: 10px;
+  background: #fbfcfe;
+}
+
+.completion-checkbox {
+  display: flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 10px;
+  color: #151515;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.completion-checkbox input {
+  width: 18px;
+  min-height: 18px;
+}
+
+#completion-save-button {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.completion-admin-table,
+.completion-student-table {
+  min-width: 760px;
+}
+
+.completion-view-button {
+  min-width: max-content;
+}
+
+.completion-student-section {
+  margin-top: 26px;
 }
 
 .teacher-select-group {
@@ -944,6 +1065,11 @@ dd,
   color: #982323;
 }
 
+.status-badge.warn {
+  background: #fff2d7;
+  color: #805100;
+}
+
 .row-arrow {
   color: #363633;
   font-size: 34px !important;
@@ -1096,6 +1222,34 @@ dd,
   min-width: 520px;
 }
 
+.completion-rank-panel {
+  margin-top: 24px;
+}
+
+.completion-rank-table {
+  min-width: 680px;
+}
+
+.rank-medal {
+  font-weight: 800;
+}
+
+.completion-progress {
+  width: min(180px, 36vw);
+  height: 8px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e4ebf3;
+}
+
+.completion-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--teal), var(--blue));
+}
+
 .quiz-detail-table {
   min-width: 640px;
 }
@@ -1192,6 +1346,10 @@ td {
     max-width: 100%;
   }
 
+  .completion-admin-grid {
+    grid-template-columns: 1fr;
+  }
+
   .teacher-step-control {
     grid-template-columns: 1fr;
   }
@@ -1204,6 +1362,7 @@ td {
   .teacher-metric-grid,
   .teacher-analysis-grid,
   .teacher-alert-banner,
+  .teacher-completion-module,
   .teacher-table-card,
   .teacher-selection-bar,
   .teacher-empty-state {
@@ -1254,7 +1413,27 @@ td {
 
 @media (max-width: 520px) {
   .topbar {
-    padding: 12px 14px;
+    min-height: 92px;
+    padding: 14px;
+  }
+
+  .brand {
+    gap: 12px;
+  }
+
+  .brand-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 9px;
+    font-size: 22px;
+  }
+
+  .brand-kicker {
+    font-size: 12px;
+  }
+
+  .brand-title {
+    font-size: 24px;
   }
 
   .teacher-app-header {

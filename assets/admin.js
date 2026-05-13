@@ -11,11 +11,14 @@ document.addEventListener("DOMContentLoaded", () => {
   loadTeacherSettings();
 
   const state = {
+    authToken: "",
     payload: null,
     selectedClassName: "",
     selectedCategoryKey: "",
     selectedDetailKey: "average",
     selectedStudentId: "",
+    selectedCompletionClassName: "",
+    completionFilter: "all",
     sortKey: "",
     sortDirection: "desc",
     showAlertsOnly: false,
@@ -72,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function applyTeacherTitle(courseTitle) {
     const config = getConfig();
-    const baseTitle = courseTitle || config.COURSE_TITLE || "成績";
+    const baseTitle = courseTitle || config.COURSE_TITLE || "載入中…";
     const title = `${baseTitle}-教師後台`;
     document.title = title;
     document.querySelectorAll(".teacher-brand strong").forEach((node) => {
@@ -94,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function loadDashboard(authToken) {
+    state.authToken = authToken;
     teacherStatus.className = "status";
     teacherStatus.textContent = "正在載入後台統計...";
     const response = await requestApi({ action: "summary", token: authToken });
@@ -104,6 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
     state.selectedCategoryKey = "";
     state.selectedDetailKey = "average";
     state.selectedStudentId = "";
+    state.selectedCompletionClassName = "";
+    state.completionFilter = "all";
     state.sortKey = "";
     state.sortDirection = "desc";
     teacherStatus.textContent = "";
@@ -114,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectionGroup = currentGroup() || allSchoolGroup();
     renderExamSelect(selectionGroup);
     renderClassTabs();
+    renderCompletionModule();
     const group = currentGroup();
     if (!state.selectedCategoryKey || !group) {
       renderEmptyDashboard(!state.selectedCategoryKey ? "請先選擇考試項目或學期總分。" : "請選擇全校或班級。");
@@ -172,6 +179,169 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".teacher-analysis-grid").classList.toggle("hidden", !visible);
     document.getElementById("teacher-alert-banner").classList.toggle("hidden", true);
     document.querySelector(".teacher-table-card").classList.toggle("hidden", !visible);
+  }
+
+  function renderCompletionModule() {
+    const module = document.getElementById("teacher-completion-module");
+    const completion = state.payload?.completion;
+    if (!module || !completion) return;
+    module.classList.remove("hidden");
+    renderCompletionSettings(completion);
+    renderCompletionClassRanking(completion);
+    renderCompletionStudents(completion);
+  }
+
+  function renderCompletionSettings(completion) {
+    const box = document.getElementById("completion-settings-box");
+    const note = document.getElementById("completion-role-note");
+    const user = state.payload?.currentUser || {};
+    const isSuperAdmin = user.role === "super_admin";
+    const enabledQuizzes = new Set(completion.settings?.enabledQuizIds || []);
+    const enabledClasses = new Set(completion.settings?.enabledClassNames || []);
+    const quizOptions = completion.quizOptions || [];
+    const classOptions = completion.classOptions || [];
+    note.textContent = isSuperAdmin ? "最高權限管理者，可調整完成度設定。" : "此設定僅限最高權限管理者調整。";
+
+    const quizCheckboxes = quizOptions.length
+      ? quizOptions.map((quiz) => `
+        <label class="completion-checkbox">
+          <input class="completion-quiz-checkbox" type="checkbox" value="${escapeHtml(quiz.id)}" ${enabledQuizzes.has(quiz.id) ? "checked" : ""} ${isSuperAdmin ? "" : "disabled"}>
+          <span>${escapeHtml(quiz.label)}</span>
+        </label>
+      `).join("")
+      : `<p class="teacher-muted-note">目前沒有可選擇的線上小考。</p>`;
+    const classCheckboxes = classOptions.length
+      ? classOptions.map((item) => `
+        <label class="completion-checkbox">
+          <input class="completion-class-checkbox" type="checkbox" value="${escapeHtml(item.id)}" ${enabledClasses.has(item.id) ? "checked" : ""} ${isSuperAdmin ? "" : "disabled"}>
+          <span>${escapeHtml(item.label)}</span>
+        </label>
+      `).join("")
+      : `<p class="teacher-muted-note">目前沒有可選擇的班級。</p>`;
+
+    box.innerHTML = `
+      <label class="completion-score-field">
+        <span>達標分數</span>
+        <input id="completion-passing-score" type="number" min="0" max="100" step="1" value="${escapeHtml(completion.settings?.passingScore ?? 60)}" ${isSuperAdmin ? "" : "disabled"}>
+      </label>
+      <div class="completion-setting-group">
+        <div class="completion-setting-title">計算測驗</div>
+        <div class="completion-quiz-list">${quizCheckboxes}</div>
+      </div>
+      <div class="completion-setting-group">
+        <div class="completion-setting-title">計算班級</div>
+        <div class="completion-quiz-list">${classCheckboxes}</div>
+      </div>
+      ${isSuperAdmin ? `<button id="completion-save-button" type="button">儲存完成度設定</button>` : ""}
+      <div id="completion-save-status" class="status"></div>`;
+
+    const saveButton = document.getElementById("completion-save-button");
+    if (saveButton) {
+      saveButton.onclick = async () => {
+        const statusNode = document.getElementById("completion-save-status");
+        const passingInput = document.getElementById("completion-passing-score");
+        const checkedIds = Array.from(box.querySelectorAll(".completion-quiz-checkbox:checked")).map((input) => input.value);
+        const checkedClasses = Array.from(box.querySelectorAll(".completion-class-checkbox:checked")).map((input) => input.value);
+        saveButton.disabled = true;
+        statusNode.className = "status";
+        statusNode.textContent = "正在儲存...";
+        try {
+          const response = await requestApi({
+            action: "saveCompletionSettings",
+            token: state.authToken,
+            passingScore: passingInput.value,
+            enabledQuizIds: checkedIds.join(","),
+            enabledClassNames: checkedClasses.join(",")
+          });
+          state.payload.completion = response.completion;
+          state.selectedCompletionClassName = "";
+          renderCompletionModule();
+          const freshStatus = document.getElementById("completion-save-status");
+          if (freshStatus) freshStatus.textContent = response.message || "已儲存。";
+        } catch (error) {
+          statusNode.className = "status error";
+          statusNode.textContent = error.message;
+        } finally {
+          saveButton.disabled = false;
+        }
+      };
+    }
+  }
+
+  function renderCompletionClassRanking(completion) {
+    const statusNode = document.getElementById("completion-ranking-status");
+    const rows = document.getElementById("completion-class-rows");
+    const rankings = completion.classRankings || [];
+    if (!rankings.length) {
+      statusNode.textContent = completion.message || "目前尚無完成度排行資料。";
+      rows.innerHTML = "";
+      return;
+    }
+
+    statusNode.textContent = "";
+    rows.innerHTML = rankings.map((group) => `
+      <tr class="${group.className === state.selectedCompletionClassName ? "is-open" : ""}">
+        <td><strong>${escapeHtml(String(group.rank))}</strong></td>
+        <td>${escapeHtml(group.className)}</td>
+        <td><strong>${formatPercent(group.completionRate)}</strong></td>
+        <td>${escapeHtml(group.completedCount)} / ${escapeHtml(group.expectedCount)}</td>
+        <td>${formatScore(group.averageScore)}</td>
+        <td><button class="secondary-action completion-view-button" type="button" data-class-name="${escapeHtml(group.className)}">查看明細</button></td>
+      </tr>
+    `).join("");
+
+    rows.querySelectorAll(".completion-view-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.selectedCompletionClassName = button.dataset.className;
+        state.completionFilter = "all";
+        renderCompletionModule();
+        document.getElementById("completion-student-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }
+
+  function renderCompletionStudents(completion) {
+    const section = document.getElementById("completion-student-section");
+    const title = document.getElementById("completion-student-title");
+    const rows = document.getElementById("completion-student-rows");
+    const group = (completion.classRankings || []).find((item) => item.className === state.selectedCompletionClassName);
+    section.classList.toggle("hidden", !group);
+    if (!group) {
+      rows.innerHTML = "";
+      return;
+    }
+
+    title.textContent = `${group.className} — 學生完成度明細`;
+    bindCompletionFilterButton("completion-filter-all", "all");
+    bindCompletionFilterButton("completion-filter-done", "done");
+    bindCompletionFilterButton("completion-filter-not-done", "notDone");
+
+    const students = (group.students || []).filter((student) => {
+      if (state.completionFilter === "done") return student.status === "已全部完成";
+      if (state.completionFilter === "notDone") return student.status !== "已全部完成";
+      return true;
+    });
+
+    rows.innerHTML = students.map((student) => `
+      <tr>
+        <td>${escapeHtml(student.className)}</td>
+        <td>${escapeHtml(student.studentId)}</td>
+        <td><strong>${escapeHtml(student.name)}</strong></td>
+        <td>${formatPercent(student.completionRate)}</td>
+        <td>${escapeHtml((student.completedQuizIds || []).join("、") || "-")}</td>
+        <td>${escapeHtml((student.incompleteQuizIds || []).join("、") || "-")}</td>
+        <td>${completionStatusBadge(student.status)}</td>
+      </tr>
+    `).join("");
+  }
+
+  function bindCompletionFilterButton(id, value) {
+    const button = document.getElementById(id);
+    button.classList.toggle("active", state.completionFilter === value);
+    button.onclick = () => {
+      state.completionFilter = value;
+      renderCompletionStudents(state.payload.completion);
+    };
   }
 
   function classGroups() {
@@ -688,11 +858,24 @@ function statusBadge(isAlert) {
     : `<span class="status-badge ok">✓ 正常</span>`;
 }
 
+function completionStatusBadge(status) {
+  if (status === "已全部完成") return `<span class="status-badge ok">✓ 已全部完成</span>`;
+  if (status === "部分完成") return `<span class="status-badge warn">部分完成</span>`;
+  return `<span class="status-badge danger">尚未完成</span>`;
+}
+
 function formatScore(value) {
   if (value === "" || value === null || value === undefined) return "-";
   const number = Number(value);
   if (Number.isNaN(number)) return String(value);
   return number.toFixed(2);
+}
+
+function formatPercent(value) {
+  if (value === "" || value === null || value === undefined) return "-";
+  const number = Number(value);
+  if (Number.isNaN(number)) return String(value);
+  return `${number.toFixed(1)}%`;
 }
 
 function formatRank(value) {
