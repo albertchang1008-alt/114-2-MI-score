@@ -9,7 +9,11 @@ function setText(id, value) {
 
 function applyCourseTitle(title) {
   const safeTitle = title || "載入中…";
-  setText("course-title", safeTitle);
+  const node = document.getElementById("course-title");
+  if (node) {
+    node.textContent = safeTitle;
+    node.classList.toggle("title-loading", safeTitle === "載入中…");
+  }
   document.title = safeTitle;
 }
 

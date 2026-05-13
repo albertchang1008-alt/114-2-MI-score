@@ -15,12 +15,34 @@
         <span class="brand-mark">成</span>
         <span class="brand-copy">
           <span class="brand-kicker">課程成績查詢</span>
-          <span id="course-title" class="brand-title">載入中…</span>
+          <span id="course-title" class="brand-title title-loading">載入中…</span>
         </span>
       </button>
     </header>
 
     <main class="shell">
+      <section class="panel completion-rank-panel" aria-live="polite">
+        <div class="panel-head compact-head">
+          <p class="eyebrow">線上小考</p>
+          <h2>班級完成度排行</h2>
+        </div>
+        <div id="completion-rank-status" class="status">正在讀取完成度排行...</div>
+        <div id="completion-rank-wrap" class="table-wrap compact-table hidden">
+          <table class="completion-rank-table">
+            <thead>
+              <tr>
+                <th>排名</th>
+                <th>班級</th>
+                <th>完成率</th>
+                <th>進度</th>
+                <th>平均分</th>
+              </tr>
+            </thead>
+            <tbody id="completion-rank-rows"></tbody>
+          </table>
+        </div>
+      </section>
+
       <section id="student-workspace" class="workspace student-workspace">
         <div class="panel query-panel">
           <div class="panel-head">
@@ -126,28 +148,6 @@
             </table>
           </div>
         </section>
-      </section>
-
-      <section class="panel completion-rank-panel" aria-live="polite">
-        <div class="panel-head compact-head">
-          <p class="eyebrow">線上小考</p>
-          <h2>班級完成度排行</h2>
-        </div>
-        <div id="completion-rank-status" class="status">正在讀取完成度排行...</div>
-        <div id="completion-rank-wrap" class="table-wrap compact-table hidden">
-          <table class="completion-rank-table">
-            <thead>
-              <tr>
-                <th>排名</th>
-                <th>班級</th>
-                <th>完成率</th>
-                <th>進度</th>
-                <th>平均分</th>
-              </tr>
-            </thead>
-            <tbody id="completion-rank-rows"></tbody>
-          </table>
-        </div>
       </section>
 
     </main>

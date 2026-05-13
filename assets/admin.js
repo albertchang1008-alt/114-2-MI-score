@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.title = title;
     document.querySelectorAll(".teacher-brand strong").forEach((node) => {
       node.textContent = title;
+      node.classList.toggle("title-loading", baseTitle === "載入中…");
     });
     document.querySelectorAll(".teacher-brand[aria-label]").forEach((node) => {
       node.setAttribute("aria-label", title);
