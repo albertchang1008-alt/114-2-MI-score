@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>載入中…-教師後台</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <script defer src="config.js"></script>
+    <script defer src="assets/shared.js"></script>
+    <script defer src="assets/admin.js"></script>
+  </head>
+  <body class="admin-page">
+    <section id="admin-gate" class="admin-login-screen">
+      <form id="admin-form" class="admin-login-card">
+        <div class="teacher-brand">
+          <span class="brand-mark">成</span>
+          <strong class="title-loading">載入中…-教師後台</strong>
+        </div>
+        <label>
+          <span>帳號</span>
+          <input id="admin-user" autocomplete="username" required>
+        </label>
+        <label>
+          <span>密碼</span>
+          <input id="admin-password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">登入後台</button>
+        <div id="admin-status" class="status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section id="dashboard" class="teacher-dashboard hidden" aria-live="polite">
+      <div class="teacher-app">
+        <header class="teacher-app-header">
+          <div class="teacher-brand" aria-label="載入中…-教師後台">
+            <span class="brand-mark">成</span>
+            <strong class="title-loading">載入中…-教師後台</strong>
+          </div>
+          <div class="teacher-header-actions">
+            <span id="teacher-alert-count" class="teacher-alert-pill">0 名示警</span>
+            <button id="logout-button" class="teacher-logout-button" type="button">登出</button>
+          </div>
+        </header>
+
+        <section id="teacher-selection-bar" class="teacher-selection-bar hidden">
+          <div class="teacher-step-control">
+            <span class="teacher-step-label">1. 選擇考試</span>
+            <div class="teacher-select-group">
+              <label class="teacher-select-label">
+                <span>類別</span>
+                <select id="teacher-exam-category-select"></select>
+              </label>
+              <label id="teacher-exam-detail-label" class="teacher-select-label hidden">
+                <span>第幾次</span>
+                <select id="teacher-exam-detail-select"></select>
+              </label>
+            </div>
+          </div>
+          <div id="teacher-class-step" class="teacher-step-control hidden">
+            <span class="teacher-step-label">2. 選擇範圍</span>
+            <div id="teacher-class-tabs" class="teacher-tabs"></div>
+          </div>
+        </section>
+
+        <div id="teacher-status" class="status" role="status" aria-live="polite"></div>
+        <section id="teacher-completion-module" class="teacher-card teacher-completion-module hidden">
+          <div class="teacher-card-head">
+            <h3>線上小考完成度</h3>
+            <span id="completion-role-note" class="teacher-muted-note"></span>
+          </div>
+          <div class="completion-admin-grid">
+            <section class="completion-settings-panel">
+              <h4>完成度設定</h4>
+              <div id="completion-settings-box"></div>
+            </section>
+            <section class="completion-ranking-panel">
+              <h4>班級完成度排行</h4>
+              <div id="completion-ranking-status" class="status"></div>
+              <div class="teacher-table-wrap">
+                <table class="teacher-table completion-admin-table">
+                  <thead>
+                    <tr>
+                      <th>排名</th>
+                      <th>班級</th>
+                      <th>完成率</th>
+                      <th>進度</th>
+                      <th>平均分</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="completion-class-rows"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+          <section id="completion-student-section" class="completion-student-section hidden">
+            <div class="teacher-table-head">
+              <h4 id="completion-student-title">學生完成度明細</h4>
+              <div class="teacher-filter-buttons">
+                <button id="completion-filter-all" type="button">全部</button>
+                <button id="completion-filter-done" type="button">已全部完成</button>
+                <button id="completion-filter-not-done" type="button">未全數完成</button>
+              </div>
+            </div>
+            <div class="teacher-table-wrap">
+              <table class="teacher-table completion-student-table">
+                <thead>
+                  <tr>
+                    <th>班級</th>
+                    <th>學號</th>
+                    <th>姓名</th>
+                    <th>完成率</th>
+                    <th>已完成測驗</th>
+                    <th>未完成測驗</th>
+                    <th>狀態</th>
+                  </tr>
+                </thead>
+                <tbody id="completion-student-rows"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+        <div id="teacher-empty-state" class="teacher-empty-state hidden">請先選擇考試項目或學期總分。</div>
+
+        <div id="teacher-metric-cards" class="teacher-metric-grid hidden"></div>
+
+        <div class="teacher-analysis-grid hidden">
+          <section class="teacher-card teacher-chart-card">
+            <div class="teacher-card-head">
+              <h3 id="teacher-chart-title">分數分布</h3>
+            </div>
+            <div id="teacher-histogram" class="teacher-histogram"></div>
+            <div class="teacher-legend">
+              <span><i class="legend-normal"></i>正常</span>
+              <span><i class="legend-deviation"></i>均值偏差</span>
+              <span><i class="legend-fixed"></i>低於門檻</span>
+            </div>
+          </section>
+
+          <section class="teacher-card teacher-alert-settings">
+            <h3>示警設定</h3>
+            <div id="teacher-alert-settings"></div>
+          </section>
+        </div>
+
+        <div id="teacher-alert-banner" class="teacher-alert-banner hidden"></div>
+
+        <section class="teacher-card teacher-table-card hidden">
+          <div class="teacher-table-head">
+            <h3 id="teacher-table-title">明細</h3>
+            <div class="teacher-filter-buttons">
+              <button id="teacher-export-class" type="button">匯出全部成績</button>
+              <button id="teacher-show-all" type="button">全部</button>
+              <button id="teacher-show-alerts" type="button">示警</button>
+            </div>
+          </div>
+          <div class="teacher-table-wrap">
+            <table class="teacher-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>姓名</th>
+                  <th><button class="sort-button" type="button" data-sort-key="score">本次</button></th>
+                  <th>班級排名</th>
+                  <th>全校排名</th>
+                  <th class="term-total-column">學期總分</th>
+                  <th>狀態</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="teacher-student-rows"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+  </body>
+</html>
