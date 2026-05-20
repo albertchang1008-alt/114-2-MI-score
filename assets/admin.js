@@ -43,10 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
     button.disabled = true;
 
     try {
+      const loginMeta = await collectLoginMeta();
       const response = await requestApi({
         action: "login",
         username: userInput.value.trim(),
-        password: passwordInput.value
+        password: passwordInput.value,
+        loginMeta: JSON.stringify(loginMeta)
       });
       window.sessionStorage.setItem("gradePortalToken", response.token);
       showDashboardShell();
@@ -63,6 +65,39 @@ document.addEventListener("DOMContentLoaded", () => {
     window.sessionStorage.removeItem("gradePortalToken");
     window.location.href = "index.html";
   });
+
+  async function collectLoginMeta() {
+    const ip = await getClientIp();
+    return {
+      ip,
+      device: deviceLabel(),
+      platform: navigator.platform || "",
+      language: navigator.language || "",
+      languages: Array.isArray(navigator.languages) ? navigator.languages.join(",") : "",
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+      screen: `${window.screen?.width || ""}x${window.screen?.height || ""}`,
+      viewport: `${window.innerWidth || ""}x${window.innerHeight || ""}`,
+      userAgent: navigator.userAgent || ""
+    };
+  }
+
+  async function getClientIp() {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
+      if (!response.ok) return "無法取得";
+      const data = await response.json();
+      return data.ip || "無法取得";
+    } catch (error) {
+      return "無法取得";
+    }
+  }
+
+  function deviceLabel() {
+    const ua = navigator.userAgent || "";
+    if (/iPad|Tablet|Android(?!.*Mobile)/i.test(ua)) return "平板";
+    if (/Mobi|Android|iPhone|iPod/i.test(ua)) return "手機";
+    return "桌機";
+  }
 
   async function loadTeacherSettings() {
     try {
